@@ -1,0 +1,70 @@
+
+[#if API_KEY!=""#]
+<form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal">
+  <div class="form-group">
+   <label class="col-lg-3 control-label"[#if ERR_TITLE#] style="color:red;font-weight:bold"[#endif#]>
+    Test Query:
+   </label>
+   <div class="col-lg-4"><input type="text" class="form-control" name="message" value="[#MESSAGE#]"></div>
+  </div>
+  <div class="form-group">
+   <div class="col-lg-offset-3 col-lg-4">
+    <button type="submit" name="subm" value="Submit" class="btn btn-primary">Test</button>
+    <input type="hidden" name="mode" value="test">
+   </div>
+  </div>
+ </fieldset>
+</form>
+[#endif#]
+[#if RESPONSE!=""#]
+<pre>[#RESPONSE#]</pre>
+[#endif RESPONSE#]
+<!-- table apiai_actions search -->
+<table width=100% border=0><tr>
+<td valign=top>
+<!-- results -->
+[#if RESULT#]
+<!-- paging -->
+<!-- / paging -->
+<!-- search results (list) -->
+<form action="?" method="post" name="frmList_apiai_actions" style="padding:0px" class="form">
+<table  align=center class="table table-striped">
+<tbody>
+[#begin RESULT#]
+<tr style="height:52px" class="hover_btn2">
+ <td style="vertical-align:middle"
+  >
+  <b>
+   [#TITLE#]
+  </a></b>
+ </td>
+ <td>[#LATEST_USAGE#]
+  [#if LATEST_PARAMS!=""#]
+  <br/><i>[#LATEST_PARAMS#]</i>
+  [#endif#]
+ </td>
+ <td style="vertical-align:middle" width="1%" nowrap>
+  <div style="width:120px">
+  [#if "<#ACTION#>"=="admin"#]
+   <a href="?view_mode=edit_apiai_actions&id=[#ID#]" class="btn btn-default" title="Edit"><i class="glyphicon glyphicon-pencil"></i></a>
+    <a href="?view_mode=delete_apiai_actions&id=[#ID#]" onClick="return confirm('Are you sure? Please confirm.')" class="btn btn-default" title="Delete"><i class="glyphicon glyphicon-remove"></i></a>
+  [#endif ACTION#]
+  </div>
+ </td>
+</tr>
+[#end RESULT#]
+</tbody>
+</table>
+<input type="hidden" name="data_source" value="<#DATA_SOURCE#>">
+<input type="hidden" name="view_mode" value="multiple_apiai_actions">
+</form>
+<!-- / search results (list) -->
+<!-- paging -->
+<!-- / paging -->
+[#else RESULT#]
+<p>
+<font color="red"><#LANG_NO_RECORDS_FOUND#></font>
+</p>
+[#endif RESULT#]
+<!-- / results -->
+</td></tr></table>

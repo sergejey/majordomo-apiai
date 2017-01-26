@@ -1,0 +1,87 @@
+
+
+ <!-- action usual -->
+ <!-- table apiai_actions search -->
+ [#if VIEW_MODE="search_apiai_actions" || VIEW_MODE=""#]
+
+ <div>
+  [ <a href="#" onClick="$('#api_settings').toggle();return false;"><#LANG_SETUP#></a> ]
+ </div>
+ <div style="display:none" id='api_settings'>
+
+  <form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal">
+   <div class="form-group">
+    <label class="col-lg-3 control-label"[#if ERR_API_KEY#] style="color:red;font-weight:bold"[#endif#]>
+     Client access token:
+    </label>
+    <div class="col-lg-4"><input type="text" class="form-control" name="api_key" value="[#API_KEY#]"></div>
+   </div>
+   <div class="form-group">
+    <label class="col-lg-3 control-label">
+     Language:
+    </label>
+    <div class="col-lg-4">
+     <select name="language" class="form-control">
+      <option value="pt-BR"[#if CONFIG_LANGUAGE="pt-BR"#] selected[#endif#]>Brazilian Portuguese</option>
+      <option value="zh-HK"[#if CONFIG_LANGUAGE="zh-HK"#] selected[#endif#]>Chinese (Cantonese)</option>
+      <option value="zh-CN"[#if CONFIG_LANGUAGE="zh-CN"#] selected[#endif#]>Chinese (Simplified)</option>
+      <option value="zh-TW"[#if CONFIG_LANGUAGE="zh-TW"#] selected[#endif#]>Chinese (Traditional)</option>
+      <option value="en"[#if CONFIG_LANGUAGE="en"#] selected[#endif#]>English</option>
+      <option value="nl"[#if CONFIG_LANGUAGE="nl"#] selected[#endif#]>Dutch</option>
+      <option value="de"[#if CONFIG_LANGUAGE="fr"#] selected[#endif#]>French</option>
+      <option value="de"[#if CONFIG_LANGUAGE="de"#] selected[#endif#]>German</option>
+      <option value="it"[#if CONFIG_LANGUAGE="it"#] selected[#endif#]>Italian</option>
+      <option value="ja"[#if CONFIG_LANGUAGE="ja"#] selected[#endif#]>Japanese</option>
+      <option value="ko"[#if CONFIG_LANGUAGE="ko"#] selected[#endif#]>Korean</option>
+      <option value="ru"[#if CONFIG_LANGUAGE="pt"#] selected[#endif#]>Portuguese</option>
+      <option value="ru"[#if CONFIG_LANGUAGE="ru"#] selected[#endif#]>Russian</option>
+      <option value="es"[#if CONFIG_LANGUAGE="es"#] selected[#endif#]>Spanish</option>
+      <option value="uk"[#if CONFIG_LANGUAGE="uk"#] selected[#endif#]>Ukrainian</option>
+
+
+     </select>
+     </div>
+   </div>
+
+   <div class="form-group">
+    <label class="col-lg-3 control-label"[#if ERR_API_KEY#] style="color:red;font-weight:bold"[#endif#]>
+     Voice priority level:
+    </label>
+    <div class="col-lg-4"><input type="text" class="form-control" name="speak_priority" value="[#CONFIG_SPEAK_PRIORITY#]"></div>
+   </div>
+
+   <div class="form-group">
+    <label class="col-lg-3 control-label">
+     Process unknown inputs:
+    </label>
+    <div class="col-lg-4">
+     <input type="radio" name="speak_unknown" value="1"[#if CONFIG_SPEAK_UNKNOWN="1"#] checked[#endif#]><#LANG_YES#>
+     <input type="radio" name="speak_unknown" value="0"[#if CONFIG_SPEAK_UNKNOWN!="1"#] checked[#endif#]><#LANG_NO#>
+     </div>
+   </div>
+
+   <div class="form-group">
+    <div class="col-lg-offset-3 col-lg-4">
+     <button type="submit" name="subm" value="Submit" class="btn btn-primary"><#LANG_UPDATE#></button>
+     <input type="hidden" name="view_mode" value="update_settings">
+     <input type="hidden" name="mode" value="update">
+    </div>
+   </div>
+   </fieldset>
+  </form>
+  <hr size="1">
+ </div>
+
+  [#inc apiai_actions_search_admin.html#]
+ [#endif VIEW_MODE#]
+ <!-- / table apiai_actions search -->
+ <!-- table apiai_actions edit -->
+ [#if VIEW_MODE="edit_apiai_actions"#]
+   [#inc apiai_actions_edit.html#]
+ [#endif VIEW_MODE#]
+ <!-- / table apiai_actions edit -->
+ <!-- table apiai_actions view --> 
+ [#if VIEW_MODE="view_apiai_actions"#]
+   [#inc apiai_actions_view.html#]
+ [#endif VIEW_MODE#]
+ <!-- / table apiai_actions view -->
