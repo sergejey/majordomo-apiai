@@ -5,6 +5,11 @@ API.AI service integration
 
 Видео по модулю:
 
+Как настроить модуль api.ai в MajorDomo
 https://www.youtube.com/watch?v=jJFTIZ4kLTY
-
+  
+Улучшаем api.ai ассистента в Majordomo 
 https://www.youtube.com/watch?v=jMAKK0fWFJg
+
+Включаем музыку и узнаём погоду голосом API.AI + Majordomo
+https://www.youtube.com/watch?v=4B4ImDR2st4
