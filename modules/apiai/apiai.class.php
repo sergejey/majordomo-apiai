@@ -239,8 +239,8 @@ function processResponse($data) {
         $this->runAction($action_name,$params);
     }
   
-   //Создать процедуру если нет action т.е. это кастомный интент
-	 if ($data['result']['metadata']['intentName']) {
+   //Иначе если action не задан, то создать процедуру для кастомного интента
+	else if ($data['result']['metadata']['intentName']) {
         $action_name=$data['result']['metadata']['intentName'];
         $params=$data['result']['parameters'];
         $this->runAction($action_name,$params);
