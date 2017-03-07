@@ -7,7 +7,7 @@ API.AI service integration
 
 Как настроить модуль api.ai в MajorDomo
 https://www.youtube.com/watch?v=jJFTIZ4kLTY
-  
+
 Улучшаем api.ai ассистента в Majordomo 
 https://www.youtube.com/watch?v=jMAKK0fWFJg
 
@@ -16,3 +16,4 @@ https://www.youtube.com/watch?v=4B4ImDR2st4
 
 Делаем финансового голосового ассистента MajorDomo+API.AI+ExchangeRates
 https://www.youtube.com/watch?v=wZSfGWjE6lc
+
