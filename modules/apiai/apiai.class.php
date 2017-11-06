@@ -262,8 +262,17 @@ function runAction($action_name,$params) {
         $rec['CODE']='';
         foreach($params as $k=>$v) {
             $rec['CODE'].="// \$params['$k']";
-            if ($v!='') {
-                $rec['CODE'].=" (ex '".str_replace("\n",' ',$v)."');";
+            if ($v!='') {                                                                                        
+                if (is_array($v)) {
+                    $s = implode("','", $v);
+                    if (count($v) > 0) {
+                        $s = "'$s'";
+                    }
+                    $s = "[$s]";
+                } else {
+                    $s = "'$v'";
+                }
+                $rec['CODE'].=" (ex ".str_replace("\n",' ',$s).");";
             }
             $rec['CODE'].="\n";
         }
@@ -272,7 +281,16 @@ function runAction($action_name,$params) {
     $rec['LATEST_USAGE']=date('Y-m-d H:i:s');
     $rec['LATEST_PARAMS']='';
     foreach($params as $k=>$v) {
-       $rec['LATEST_PARAMS'].="$k = '$v'; ";
+        if (is_array($v)) {
+            $s = implode("','", $v);
+            if (count($v) > 0) {
+                $s = "'$s'";
+            }
+            $s = "[$s]";
+        } else {
+            $s = "'$v'";
+        }
+        $rec['LATEST_PARAMS'].="$k = $s; ";
     }
     $rec['LATEST_PARAMS']=trim($rec['LATEST_PARAMS']);
     SQLUpdate('apiai_actions',$rec);
