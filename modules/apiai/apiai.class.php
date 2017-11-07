@@ -184,7 +184,7 @@ function admin(&$out) {
     }
 
 function apiRequest($command, $data) {
-    $url='https://api.api.ai/v1/'.$command;
+    $url='https://api.api.ai/v1/'.$command.'?v=20170712';
     $this->getConfig();
     $access_token=$this->config['API_KEY'];
     $ch = curl_init($url);
@@ -208,7 +208,6 @@ function sendQry($qry) {
     $this->getConfig();
     $data=array();
     $data['query']=$qry;
-    $data['v']='20170126';
     if ($this->config['LATEST_SID']!='') {
         $data['sessionId']=$this->config['LATEST_SID'];
     } else {
