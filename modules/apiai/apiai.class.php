@@ -184,7 +184,7 @@ function admin(&$out) {
     }
 
 function apiRequest($command, $data) {
-    $url='https://api.api.ai/v1/'.$command.'?v=20170712';
+    $url='https://api.dialogflow.com/v1/'.$command.'?v=20170712';
     $this->getConfig();
     $access_token=$this->config['API_KEY'];
     $ch = curl_init($url);
