@@ -227,9 +227,9 @@ function processResponse($data) {
         $this->saveConfig();
     }
     //input.unknown
-    if ($data['result']['speech']) {
+    if ($data['result']['fulfillment']['speech']) {
         if ($data['result']['action']!='input.unknown' || $this->config['SPEAK_UNKNOWN']) {
-            sayReply($data['result']['speech'],$this->config['SPEAK_PRIORITY']);
+            sayReply($data['result']['fulfillment']['speech'],$this->config['SPEAK_PRIORITY']);
         }
     }
     if ($data['result']['action']) {
