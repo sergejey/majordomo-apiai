@@ -182,26 +182,62 @@ class apiai extends module
     {
         $this->getConfig();
         if ($event == 'COMMAND' && $this->config['API_KEY'] != '' && $details['message'] != '') {
-            $message   = $details['message'];
-            $source    = $details['source'];
-
-            $member_id = (int) $details['member_id'];
-            $rec = SQLSelectOne("select * from users where id=$member_id;");
-            if ($member_id && $rec['ID']) {
-                $this->deleteContext('nouser', $source);
-                $this->setContext('user', $source, array(
-                    'parameters' => array(
-                        'username' => $rec['NAME']
-                    )
-                ));
-            }
-            else
-            {
-                $this->deleteContext('user', $source);
-                $this->setContext('nouser', $source);
+            $message = $details['message'];
+            
+            $t_contexts = array();
+            $source     = $details['source'];
+            if (preg_match('/^terminal(\\d+)$/', $source, $terminal_id)) {
+                $terminal_id = $terminal_id[1];
+                $rec         = SQLSelectOne("select * from terminals where ID = $terminal_id;");
+                if ($terminal_id && $rec['ID']) {
+                    $term_params = array(
+                        'terminalid' => $rec['ID'],
+                        'terminal' => $rec['NAME'],
+                        'terminal.original' => $rec['TITLE']
+                    );
+                    $t_contexts  = array(
+                        array(
+                            'name' => 'known-terminal',
+                            'parameters' => $term_params
+                        ),
+                        array(
+                            'name' => 'terminal-' . $rec['NAME'],
+                            'parameters' => $term_params
+                        )
+                    );
+                } else {
+                    $t_contexts = array(
+                        'unknown-terminal'
+                    );
+                }
             }
             
-            $data = $this->sendQry($message, $source);
+            $u_contexts = array();
+            $member_id  = (int) $details['member_id'];
+            $rec        = SQLSelectOne("select * from users where ID = $member_id;");
+            if ($member_id && $rec['ID']) {
+                $user_params = array(
+                    'userid' => $rec['ID'],
+                    'user' => $rec['USERNAME'],
+                    'user.original' => $rec['NAME']
+                );
+                $u_contexts  = array(
+                    array(
+                        'name' => 'known-user',
+                        'parameters' => $user_params
+                    ),
+                    array(
+                        'name' => 'user-' . $rec['USERNAME'],
+                        'parameters' => $user_params
+                    )
+                );
+            } else {
+                $u_contexts = array(
+                    'unknown-user'
+                );
+            }
+            
+            $data = $this->sendQry($message, $source, array_merge($t_contexts, $u_contexts));
             $res  = $this->processResponse($data);
             if ($res) {
                 $details['BREAK'] = 1;
@@ -273,6 +309,7 @@ class apiai extends module
         return json_decode($result, true);
         
     }
+
     function apiPostRequest($command, $data)
     {
         $this->getConfig();
@@ -295,7 +332,6 @@ class apiai extends module
         curl_close($ch);
         
         return json_decode($result, true);
-        
     }
     
     function apiDeleteRequest($command)
@@ -322,7 +358,7 @@ class apiai extends module
         
     }
     
-    function sendQry($qry, $source = '')
+    function sendQry($qry, $source = '', $contexts = array())
     {
         $this->getConfig();
         
@@ -333,7 +369,7 @@ class apiai extends module
         if (!$data['lang'])
             $data['lang'] = 'en';
         
-        $data['contexts'] = $this->globalContexts();
+        $data['contexts'] = array_merge($this->globalContexts(), $contexts);
         
         $result = $this->apiPostRequest('query?v=' . $this->api_version, $data);
         return $result;
@@ -341,9 +377,11 @@ class apiai extends module
     
     function setContext($name, $source = '', $data = array())
     {
-        $sid    = $this->getSession($source);
+        $sid          = $this->getSession($source);
         $data['name'] = $name;
-        $result = $this->apiPostRequest("contexts?sessionId=$sid", array($data));
+        $result       = $this->apiPostRequest("contexts?sessionId=$sid", array(
+            $data
+        ));
         return $result;
     }
     
@@ -442,7 +480,7 @@ class apiai extends module
         if (!$rec['ID']) {
             $rec          = array();
             $rec['TITLE'] = $action_name;
-            $rec['CODE']  = '';
+            $rec['CODE']  = "// \$action_name\n// \$data\n";
             foreach ($params as $k => $v) {
                 $rec['CODE'] .= "// \$params['$k']";
                 if ($v != '') {
@@ -487,6 +525,7 @@ class apiai extends module
                 if ($success === false) {
                     registerError('apiai', sprintf('Error in apiai "%s". Code: %s', $rec['TITLE'], $code));
                 }
+
                 return $success;
             }
             catch (Exception $e) {
