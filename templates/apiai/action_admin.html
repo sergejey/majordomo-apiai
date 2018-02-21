@@ -33,7 +33,7 @@
       <option value="it"[#if CONFIG_LANGUAGE="it"#] selected[#endif#]>Italian</option>
       <option value="ja"[#if CONFIG_LANGUAGE="ja"#] selected[#endif#]>Japanese</option>
       <option value="ko"[#if CONFIG_LANGUAGE="ko"#] selected[#endif#]>Korean</option>
-      <option value="ru"[#if CONFIG_LANGUAGE="pt"#] selected[#endif#]>Portuguese</option>
+      <option value="pt"[#if CONFIG_LANGUAGE="pt"#] selected[#endif#]>Portuguese</option>
       <option value="ru"[#if CONFIG_LANGUAGE="ru"#] selected[#endif#]>Russian</option>
       <option value="es"[#if CONFIG_LANGUAGE="es"#] selected[#endif#]>Spanish</option>
       <option value="uk"[#if CONFIG_LANGUAGE="uk"#] selected[#endif#]>Ukrainian</option>
@@ -48,6 +48,13 @@
      Voice priority level:
     </label>
     <div class="col-lg-4"><input type="text" class="form-control" name="speak_priority" value="[#CONFIG_SPEAK_PRIORITY#]"></div>
+   </div>
+
+   <div class="form-group">
+    <label class="col-lg-3 control-label"[#if ERR_API_KEY#] style="color:red;font-weight:bold"[#endif#]>
+     Client session timeout (seconds):
+    </label>
+    <div class="col-lg-4"><input type="text" class="form-control" name="session_timeout" value="[#CONFIG_SESSION_TIMEOUT#]"></div>
    </div>
 
    <div class="form-group">
