@@ -49,7 +49,7 @@ class apiai extends module
             $p["edit_mode"] = $this->edit_mode;
         }
         if (IsSet($this->tab)) {
-            $p["tab"]=$this->tab;
+            $p["tab"] = $this->tab;
         }
 
         return parent::saveParams($p);
@@ -194,7 +194,7 @@ class apiai extends module
         }
         if ($this->view_mode == 'delete_apiai_entities') {
             $this->delete_apiai_entities($this->id);
-            $this->redirect("?");
+            $this->redirect("?view_mode=search_apiai_entities");
         }
     }
     
