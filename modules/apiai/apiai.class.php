@@ -196,6 +196,10 @@ class apiai extends module
             $this->delete_apiai_entities($this->id);
             $this->redirect("?view_mode=search_apiai_entities");
         }
+        if ($this->view_mode == 'send_apiai_entity') {
+            $this->send_apiai_entity($out, $this->id);
+            $this->redirect("?view_mode=search_apiai_entities");
+        }
     }
     
     function processSubscription($event, &$details)
@@ -680,6 +684,18 @@ class apiai extends module
         $rec = SQLSelectOne("SELECT * FROM apiai_entities WHERE ID='$id'");
         // some action for related tables
         SQLExec("DELETE FROM apiai_entities WHERE ID='" . $rec['ID'] . "'");
+    }
+    /**
+     * apiai_entities delete record
+     *
+     * @access public
+     */
+    function send_apiai_entity(&$out, $id)
+    {
+        $rec = SQLSelectOne("SELECT * FROM apiai_entities WHERE ID='$id'");
+        if($rec['NAME']) {
+            $this->sendEntity($rec['NAME']);
+        }
     }
     /**
      * Install
