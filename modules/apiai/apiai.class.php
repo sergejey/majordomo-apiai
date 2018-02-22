@@ -39,6 +39,9 @@ class apiai extends module
         if (IsSet($this->id)) {
             $p["id"] = $this->id;
         }
+        if (IsSet($this->data_source)) {
+            $p["data_source"]=$this->data_source;
+        }
         if (IsSet($this->view_mode)) {
             $p["view_mode"] = $this->view_mode;
         }
@@ -46,8 +49,9 @@ class apiai extends module
             $p["edit_mode"] = $this->edit_mode;
         }
         if (IsSet($this->tab)) {
-            $p["tab"] = $this->tab;
+            $p["tab"]=$this->tab;
         }
+
         return parent::saveParams($p);
     }
     /**
@@ -61,6 +65,7 @@ class apiai extends module
     {
         global $id;
         global $mode;
+        global $data_source;
         global $view_mode;
         global $edit_mode;
         global $tab;
@@ -69,6 +74,9 @@ class apiai extends module
         }
         if (isset($mode)) {
             $this->mode = $mode;
+        }
+        if (isset($data_source)) {
+            $this->data_source = $data_source;
         }
         if (isset($view_mode)) {
             $this->view_mode = $view_mode;
@@ -123,6 +131,7 @@ class apiai extends module
         $this->getConfig();
         
         $out['API_KEY']                = $this->config['API_KEY'];
+        $out['DEV_API_KEY']            = $this->config['DEV_API_KEY'];
         $out['CONFIG_SPEAK_PRIORITY']  = $this->config['SPEAK_PRIORITY'];
         $out['CONFIG_SPEAK_UNKNOWN']   = $this->config['SPEAK_UNKNOWN'];
         $out['CONFIG_LANGUAGE']        = $this->config['LANGUAGE'];
@@ -132,6 +141,8 @@ class apiai extends module
         if ($this->view_mode == 'update_settings') {
             global $api_key;
             $this->config['API_KEY'] = $api_key;
+            global $dev_api_key;
+            $this->config['DEV_API_KEY'] = $dev_api_key;
             global $speak_priority;
             $this->config['SPEAK_PRIORITY'] = (int) $speak_priority;
             global $speak_unknown;
@@ -151,6 +162,7 @@ class apiai extends module
         }
         if (isset($this->data_source) && !$_GET['data_source'] && !$_POST['data_source']) {
             $out['SET_DATASOURCE'] = 1;
+            $out['DATA_SOURCE'] = $this->data_source;
         }
         
         if ($this->mode == 'test') {
@@ -158,23 +170,31 @@ class apiai extends module
             if ($message) {
                 $out['MESSAGE']  = htmlspecialchars($message);
                 $result          = $this->sendQry($message);
-                $out['RESPONSE'] = json_encode($result);
+                $out['RESPONSE'] = json_encode($result, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
                 $this->processResponse($result);
             }
         }
         
-        if ($this->data_source == 'apiai_actions' || $this->data_source == '') {
-            if ($this->view_mode == '' || $this->view_mode == 'search_apiai_actions') {
-                $this->search_apiai_actions($out);
-            }
-            if ($this->view_mode == 'edit_apiai_actions') {
-                $this->edit_apiai_actions($out, $this->id);
-            }
-            if ($this->view_mode == 'delete_apiai_actions') {
-                $this->delete_apiai_actions($this->id);
-                $this->redirect("?");
-            }
-            
+        if ($this->view_mode == '' || $this->view_mode == 'search_apiai_actions') {
+            $this->search_apiai_actions($out);
+        }
+        if ($this->view_mode == 'edit_apiai_actions') {
+            $this->edit_apiai_actions($out, $this->id);
+        }
+        if ($this->view_mode == 'delete_apiai_actions') {
+            $this->delete_apiai_actions($this->id);
+            $this->redirect("?");
+        }
+
+        if ($this->view_mode == 'search_apiai_entities') {
+            $this->search_apiai_entities($out);
+        }
+        if ($this->view_mode == 'edit_apiai_entities') {
+            $this->edit_apiai_entities($out, $this->id);
+        }
+        if ($this->view_mode == 'delete_apiai_entities') {
+            $this->delete_apiai_entities($this->id);
+            $this->redirect("?");
         }
     }
     
@@ -188,10 +208,10 @@ class apiai extends module
             $source     = $details['source'];
             if (preg_match('/^terminal(\\d+)$/', $source, $terminal_id)) {
                 $terminal_id = $terminal_id[1];
-                $rec         = SQLSelectOne("select * from terminals where ID = $terminal_id;");
+                $rec         = SQLSelectOne("select * from terminals where ID = '$terminal_id';");
                 if ($terminal_id && $rec['ID']) {
+                    $source = $rec['NAME'];
                     $term_params = array(
-                        'terminalid' => $rec['ID'],
                         'terminal' => $rec['NAME'],
                         'terminal.original' => $rec['TITLE']
                     );
@@ -201,7 +221,7 @@ class apiai extends module
                             'parameters' => $term_params
                         ),
                         array(
-                            'name' => 'terminal-' . $rec['NAME'],
+                            'name' => 'terminal-' . str_replace('_', '-', $rec['NAME']),
                             'parameters' => $term_params
                         )
                     );
@@ -214,10 +234,9 @@ class apiai extends module
             
             $u_contexts = array();
             $member_id  = (int) $details['member_id'];
-            $rec        = SQLSelectOne("select * from users where ID = $member_id;");
+            $rec        = SQLSelectOne("select * from users where ID = '$member_id';");
             if ($member_id && $rec['ID']) {
                 $user_params = array(
-                    'userid' => $rec['ID'],
                     'user' => $rec['USERNAME'],
                     'user.original' => $rec['NAME']
                 );
@@ -227,7 +246,7 @@ class apiai extends module
                         'parameters' => $user_params
                     ),
                     array(
-                        'name' => 'user-' . $rec['USERNAME'],
+                        'name' => 'user-' . str_replace('_', '-', $rec['USERNAME']),
                         'parameters' => $user_params
                     )
                 );
@@ -287,12 +306,12 @@ class apiai extends module
         return $source;
     }
     
-    function apiRequest($command)
+    function apiRequest($command, $dev = false)
     {
         $this->getConfig();
         
         $url          = $this->api_endpoint . $command;
-        $access_token = $this->config['API_KEY'];
+        $access_token = $dev ? $this->config['DEV_API_KEY'] : $this->config['API_KEY'];
         $ch           = curl_init($url);
         $headers      = array(
             'Authorization: Bearer ' . $access_token,
@@ -310,12 +329,12 @@ class apiai extends module
         
     }
 
-    function apiPostRequest($command, $data)
+    function apiPostRequest($command, $data, $dev = false)
     {
         $this->getConfig();
         
         $url          = $this->api_endpoint . $command;
-        $access_token = $this->config['API_KEY'];
+        $access_token = $dev ? $this->config['DEV_API_KEY'] : $this->config['API_KEY'];
         $ch           = curl_init($url);
         $headers      = array(
             'Authorization: Bearer ' . $access_token,
@@ -334,12 +353,36 @@ class apiai extends module
         return json_decode($result, true);
     }
     
-    function apiDeleteRequest($command)
+    function apiPutRequest($command, $data, $dev = false)
     {
         $this->getConfig();
         
         $url          = $this->api_endpoint . $command;
-        $access_token = $this->config['API_KEY'];
+        $access_token = $dev ? $this->config['DEV_API_KEY'] : $this->config['API_KEY'];
+        $ch           = curl_init($url);
+        $headers      = array(
+            'Authorization: Bearer ' . $access_token,
+            'Content-type: application/json'
+        );
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        $result = curl_exec($ch);
+        curl_close($ch);
+        
+        return json_decode($result, true);
+    }
+    
+    function apiDeleteRequest($command, $dev = false)
+    {
+        $this->getConfig();
+        
+        $url          = $this->api_endpoint . $command;
+        $access_token = $dev ? $this->config['DEV_API_KEY'] : $this->config['API_KEY'];
         $ch           = curl_init($url);
         $headers      = array(
             'Authorization: Bearer ' . $access_token,
@@ -356,6 +399,41 @@ class apiai extends module
         
         return json_decode($result, true);
         
+    }
+
+    function sendEntity($entity_name, $source = null)
+    {
+        $rec = SQLSelectOne("select ID, LAST_EXPORT, CODE from apiai_entities where NAME LIKE '" . DBSafe($entity_name) . "'");
+        if ($rec['CODE'] != '') {
+            try {
+                $code    = $rec['CODE'];
+                $data = eval($code);
+                if (!is_array($data)) {
+                    registerError('apiai', sprintf('Error in apiai "%s". Code: %s', $entity_name, $code));
+                    return;
+                }
+            }
+            catch (Exception $e) {
+                registerError('apiai', sprintf('Error in apiai "%s": ' . $e->getMessage(), $rec['TITLE']));
+                return;
+            }
+        }
+
+        if(is_null($source)) {
+            $result = $this->apiPutRequest("entities?v" . $this->api_version, $data, true);
+        }
+        else
+        {
+            $sid = $this->getSession($source);            
+            $data = array('sessionId' => $sid, 'entities' => array($data));
+            $result = $this->apiPostRequest("userEntities?v" . $this->api_version, $data, false);
+        }
+
+        
+        $rec['LAST_EXPORT'] = date('Y-m-d H:i:s');
+        SQLUpdate('apiai_entities', $rec);
+
+        return $result;        
     }
     
     function sendQry($qry, $source = '', $contexts = array())
@@ -575,6 +653,35 @@ class apiai extends module
         SQLExec("DELETE FROM apiai_actions WHERE ID='" . $rec['ID'] . "'");
     }
     /**
+     * apiai_entities search
+     *
+     * @access public
+     */
+    function search_apiai_entities(&$out)
+    {
+        require(DIR_MODULES . $this->name . '/apiai_entities_search.inc.php');
+    }
+    /**
+     * apiai_entities edit/add
+     *
+     * @access public
+     */
+    function edit_apiai_entities(&$out, $id)
+    {
+        require(DIR_MODULES . $this->name . '/apiai_entities_edit.inc.php');
+    }
+    /**
+     * apiai_entities delete record
+     *
+     * @access public
+     */
+    function delete_apiai_entities($id)
+    {
+        $rec = SQLSelectOne("SELECT * FROM apiai_entities WHERE ID='$id'");
+        // some action for related tables
+        SQLExec("DELETE FROM apiai_entities WHERE ID='" . $rec['ID'] . "'");
+    }
+    /**
      * Install
      *
      * Module installation routine
@@ -583,7 +690,6 @@ class apiai extends module
      */
     function install($data = '')
     {
-        
         parent::install();
     }
     /**
@@ -596,6 +702,7 @@ class apiai extends module
     function uninstall()
     {
         SQLExec('DROP TABLE IF EXISTS apiai_actions');
+        SQLExec('DROP TABLE IF EXISTS apiai_entities');
         parent::uninstall();
     }
     /**
@@ -607,19 +714,94 @@ class apiai extends module
      */
     function dbInstall()
     {
-        /*
-        apiai_actions - 
-        */
-        $data = <<<EOD
+        $data = <<<'EOD'
  apiai_actions: ID int(10) unsigned NOT NULL auto_increment
- apiai_actions: TITLE varchar(100) NOT NULL DEFAULT ''
+ apiai_actions: TITLE varchar(255) NOT NULL DEFAULT ''
  apiai_actions: LATEST_PARAMS varchar(255) NOT NULL DEFAULT '' 
  apiai_actions: LATEST_USAGE datetime
  apiai_actions: CODE text
+
+ apiai_entities: ID int(10) unsigned NOT NULL auto_increment
+ apiai_entities: NAME varchar(255) NOT NULL DEFAULT ''
+ apiai_entities: LAST_EXPORT datetime
+ apiai_entities: CODE text
 EOD;
         parent::dbInstall($data);
+
+// --------------------------------------------------------------------
+        $code = <<<'EOD'
+$terminals = SQLSelect('select NAME, TITLE from terminals');
+$total = count($terminals);
+$entries = array();
+for($i=0; $i<$total; $i++) {
+ $entries[] = array('value' => $terminals[$i]['NAME'], 'synonyms' => array($terminals[$i]['TITLE']));
+}
+
+$entity = array(
+ 'name' => 'terminal',
+ 'entries' => $entries
+);
+
+return $entity;
+EOD;
+    
+        $rec = SQLSelect("select * from apiai_entities where NAME LIKE 'terminal'");
+        if(!count($rec)) {
+            $rec = array('NAME' => 'terminal', 'CODE' => $code);
+            SQLInsert('apiai_entities', $rec);
+        }
+
+// --------------------------------------------------------------------
+        $code = <<<'EOD'
+$users = SQLSelect('select USERNAME, NAME from users');
+$total = count($users);
+$entries = array();
+for($i=0; $i<$total; $i++) {
+ $entries[] = array('value' => $users[$i]['USERNAME'], 'synonyms' => array($users[$i]['NAME']));
+}
+
+$entity = array(
+ 'name' => 'user',
+ 'entries' => $entries
+);
+
+return $entity;
+EOD;
+    
+        $rec = SQLSelect("select * from apiai_entities where NAME LIKE 'user'");
+        if(!count($rec)) {
+            $rec = array('NAME' => 'user', 'CODE' => $code);
+            SQLInsert('apiai_entities', $rec);
+        }
+
+// --------------------------------------------------------------------
+        $code = <<<'EOD'
+$rooms = getObjectsByClass('Rooms');
+$total = count($rooms);
+$entries = array();
+for($i=0; $i<$total; $i++) {
+ $name = $rooms[$i]['TITLE'];
+ $entry = array('value' => $name);
+ $title = gg($rooms[$i]['TITLE'].'.Title');
+ if($title)
+   $entry['synonyms'] = array($title);
+ $entries[] = $entry;
+}
+
+$entity = array(
+ 'name' => 'room',
+ 'entries' => $entries
+);
+
+return $entity;
+EOD;
+    
+        $rec = SQLSelect("select * from apiai_entities where NAME LIKE 'room'");
+        if(!count($rec)) {
+            $rec = array('NAME' => 'room', 'CODE' => $code);
+            SQLInsert('apiai_entities', $rec);
+        }
     }
-    // --------------------------------------------------------------------
 }
 /*
  *

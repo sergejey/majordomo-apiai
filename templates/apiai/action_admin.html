@@ -1,8 +1,7 @@
 
 
  <!-- action usual -->
- <!-- table apiai_actions search -->
- [#if VIEW_MODE="search_apiai_actions" || VIEW_MODE=""#]
+ [#if VIEW_MODE="search_apiai_actions" || VIEW_MODE="search_apiai_entities" || VIEW_MODE=""#]
 
  <div>
   [ <a href="#" onClick="$('#api_settings').toggle();return false;"><#LANG_SETUP#></a> ]
@@ -15,6 +14,12 @@
      Client access token:
     </label>
     <div class="col-lg-4"><input type="text" class="form-control" name="api_key" value="[#API_KEY#]"></div>
+   </div>
+   <div class="form-group">
+    <label class="col-lg-3 control-label"[#if ERR_API_KEY#] style="color:red;font-weight:bold"[#endif#]>
+     Developer access token (optional):
+    </label>
+    <div class="col-lg-4"><input type="text" class="form-control" name="dev_api_key" value="[#DEV_API_KEY#]"></div>
    </div>
    <div class="form-group">
     <label class="col-lg-3 control-label">
@@ -79,16 +84,66 @@
   <hr size="1">
  </div>
 
-  [#inc apiai_actions_search_admin.html#]
- [#endif VIEW_MODE#]
+ [#if API_KEY!=""#]
+<form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal">
+  <div class="form-group">
+   <label class="col-lg-3 control-label"[#if ERR_TITLE#] style="color:red;font-weight:bold"[#endif#]>
+    Test Query:
+   </label>
+   <div class="col-lg-4"><input type="text" class="form-control" name="message" value="[#MESSAGE#]"></div>
+  </div>
+  <div class="form-group">
+   <div class="col-lg-offset-3 col-lg-4">
+    <button type="submit" name="subm" value="Submit" class="btn btn-primary">Test</button>
+    <input type="hidden" name="mode" value="test">
+   </div>
+  </div>
+ </fieldset>
+</form>
+[#endif#]
+[#if RESPONSE!=""#]
+<pre>[#RESPONSE#]</pre>
+[#endif RESPONSE#]
+
+<ul class="nav nav-tabs">
+  <li[#if VIEW_MODE="search_apiai_actions" || VIEW_MODE=""#] class="active"[#endif#]>
+   <a href="?view_mode=search_apiai_actions">Actions</a>
+  </li>
+  <li[#if VIEW_MODE="search_apiai_entities"#] class="active"[#endif#]>
+   <a href="?view_mode=search_apiai_entities">Entities</a>
+  </li>
+</ul>
+
+
+ [#if VIEW_MODE="search_apiai_actions" || VIEW_MODE=""#]
+ <!-- table apiai_actions search -->
+   [#inc apiai_actions_search_admin.html#]
  <!-- / table apiai_actions search -->
+ [#else#]
+ <!-- table apiai_entities search -->
+   [#inc apiai_entities_search_admin.html#]
+ <!-- / table apiai_entities search -->
+ [#endif VIEW_MODE#]
+[#endif VIEW_MODE#]
+ 
+ [#if VIEW_MODE="edit_apiai_entities"#]
+ <!-- table apiai_entities edit -->
+   [#inc apiai_entities_edit.html#]
+ <!-- / table apiai_entities edit -->
+ [#endif VIEW_MODE#]
+ [#if VIEW_MODE="view_apiai_entities"#]
+ <!-- table apiai_entities view --> 
+   [#inc apiai_entities_view.html#]
+ <!-- / table apiai_entities view -->
+ [#endif VIEW_MODE#]
+
+  [#if VIEW_MODE="edit_apiai_actions"#]
  <!-- table apiai_actions edit -->
- [#if VIEW_MODE="edit_apiai_actions"#]
    [#inc apiai_actions_edit.html#]
- [#endif VIEW_MODE#]
  <!-- / table apiai_actions edit -->
- <!-- table apiai_actions view --> 
- [#if VIEW_MODE="view_apiai_actions"#]
-   [#inc apiai_actions_view.html#]
  [#endif VIEW_MODE#]
+ [#if VIEW_MODE="view_apiai_actions"#]
+ <!-- table apiai_actions view --> 
+   [#inc apiai_actions_view.html#]
  <!-- / table apiai_actions view -->
+ [#endif VIEW_MODE#]
