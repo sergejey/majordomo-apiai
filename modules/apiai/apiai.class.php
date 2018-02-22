@@ -557,12 +557,13 @@ class apiai extends module
     
     function runAction($action_name, &$data)
     {
-        $params = $data['result']['parameters'];
-        $rec    = SQLSelectOne("SELECT * FROM apiai_actions WHERE TITLE LIKE '" . DBSafe($action_name) . "'");
+        $params   = $data['result']['parameters'];
+        $contexts = $data['result']['contexts'];
+        $rec      = SQLSelectOne("SELECT * FROM apiai_actions WHERE TITLE LIKE '" . DBSafe($action_name) . "'");
         if (!$rec['ID']) {
             $rec          = array();
             $rec['TITLE'] = $action_name;
-            $rec['CODE']  = "// \$action_name\n// \$data\n";
+            $rec['CODE']  = '';
             foreach ($params as $k => $v) {
                 $rec['CODE'] .= "// \$params['$k']";
                 if ($v != '') {
@@ -598,7 +599,46 @@ class apiai extends module
         $rec['LATEST_PARAMS'] = trim($rec['LATEST_PARAMS']);
         SQLUpdate('apiai_actions', $rec);
         
+        $self = $this;
         
+        $setContext = function ($name, $lifespan = 5, $parameters = null) use ($self, $source)
+        {
+            $data = array('lifespan' => $lifespan);
+            if(is_array($parameters))
+                $data['parameters'] = $parameters;
+
+            return $self->setContext($name, $source, $data);
+        };
+
+        $deleteContext = function ($name = '') use ($self, $source)
+        {
+            return $self->deleteContext($name, $source);
+        };
+        
+        $globalContexts = function () use ($self)
+        {
+            return $self->globalContexts();
+        };
+
+        $setGlobalContext = function ($name, $lifespan = 5, $parameters = null) use ($self, $source)
+        {
+            $data = array('lifespan' => $lifespan);
+            if(is_array($parameters))
+                $data['parameters'] = $parameters;
+
+            $self->setGlobalContext($name, $data);
+        };
+
+        $deleteGlobalContext = function ($name) use ($self)
+        {
+            $self->deleteGlobalContext($name);
+        };
+
+        $sendEntity = function ($entity_name) use ($self, $source)
+        {
+            return $self->sendEntity($entity_name, $source);
+        };
+
         if ($rec['CODE'] != '') {
             try {
                 $source  = $this->getSource($data['sessionId']);
