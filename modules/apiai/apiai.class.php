@@ -634,7 +634,7 @@ class apiai extends module
             $self->deleteGlobalContext($name);
         };
 
-        $sendUserEntity = function ($entity_name) use ($self, $source)
+        $setSessionEntity = function ($entity_name) use ($self, $source)
         {
             return $self->sendEntity($entity_name, $source);
         };
