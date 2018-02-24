@@ -130,12 +130,13 @@ class apiai extends module
     {
         $this->getConfig();
         
-        $out['API_KEY']                = $this->config['API_KEY'];
-        $out['DEV_API_KEY']            = $this->config['DEV_API_KEY'];
-        $out['CONFIG_SPEAK_PRIORITY']  = $this->config['SPEAK_PRIORITY'];
-        $out['CONFIG_SPEAK_UNKNOWN']   = $this->config['SPEAK_UNKNOWN'];
-        $out['CONFIG_LANGUAGE']        = $this->config['LANGUAGE'];
-        $out['CONFIG_SESSION_TIMEOUT'] = $this->config['SESSION_TIMEOUT'];
+        $out['API_KEY']                 = $this->config['API_KEY'];
+        $out['DEV_API_KEY']             = $this->config['DEV_API_KEY'];
+        $out['CONFIG_MODULE_PRIORITY']  = isset($this->config['CONFIG_MODULE_PRIORITY']) ? $this->config['CONFIG_MODULE_PRIORITY'] : 100;
+        $out['CONFIG_SPEAK_PRIORITY']   = $this->config['SPEAK_PRIORITY'];
+        $out['CONFIG_SPEAK_UNKNOWN']    = $this->config['SPEAK_UNKNOWN'];
+        $out['CONFIG_LANGUAGE']         = $this->config['LANGUAGE'];
+        $out['CONFIG_SESSION_TIMEOUT']  = $this->config['SESSION_TIMEOUT'];
         
         
         if ($this->view_mode == 'update_settings') {
@@ -143,6 +144,7 @@ class apiai extends module
             $this->config['API_KEY'] = $api_key;
             global $dev_api_key;
             $this->config['DEV_API_KEY'] = $dev_api_key;
+            global $module_priority;
             global $speak_priority;
             $this->config['SPEAK_PRIORITY'] = (int) $speak_priority;
             global $speak_unknown;
@@ -155,7 +157,9 @@ class apiai extends module
             $this->saveConfig();
             
             if ($this->config['API_KEY'] != '') {
-                subscribeToEvent($this->name, 'COMMAND', '', 100);
+                subscribeToEvent($this->name, 'COMMAND', '', (int) $module_priority);
+            }
+                unsubscribeFromEvent($this->name, 'COMMAND');
             }
             
             $this->redirect("?");
@@ -309,7 +313,7 @@ class apiai extends module
         }
         return $source;
     }
-    
+
     function apiRequest($command, $dev = false)
     {
         $this->getConfig();
@@ -762,6 +766,7 @@ class apiai extends module
     {
         SQLExec('DROP TABLE IF EXISTS apiai_actions');
         SQLExec('DROP TABLE IF EXISTS apiai_entities');
+        unsubscribeFromEvent($this->name, 'COMMAND');
         parent::uninstall();
     }
     /**
