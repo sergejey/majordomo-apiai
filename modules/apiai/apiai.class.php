@@ -524,11 +524,14 @@ class apiai extends module
         
         if ($data['result']['action']) {
             $action_name = $data['result']['action'];
-            $this->runAction($action_name, $data);
+            $actionResult = $this->runAction($action_name, $data);
         } else if ($data['result']['metadata']['intentName']) {
             $action_name = $data['result']['metadata']['intentName'];
-            $this->runAction($action_name, $data);
+            $actionResult = $this->runAction($action_name, $data);
         }
+
+        if ($actionResult === false)
+            return 0;
         
         $message = $data['result']['fulfillment']['speech'];
         if ($message != '') {
