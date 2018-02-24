@@ -768,7 +768,7 @@ class apiai extends module
      *
      * @access private
      */
-    function dbInstall()
+    function dbInstall($data='')
     {
         $data = <<<'EOD'
  apiai_actions: ID int(10) unsigned NOT NULL auto_increment
