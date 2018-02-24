@@ -145,6 +145,7 @@ class apiai extends module
             global $dev_api_key;
             $this->config['DEV_API_KEY'] = $dev_api_key;
             global $module_priority;
+            $this->config['CONFIG_MODULE_PRIORITY'] = (int) $module_priority;
             global $speak_priority;
             $this->config['SPEAK_PRIORITY'] = (int) $speak_priority;
             global $speak_unknown;
@@ -159,6 +160,8 @@ class apiai extends module
             if ($this->config['API_KEY'] != '') {
                 subscribeToEvent($this->name, 'COMMAND', '', (int) $module_priority);
             }
+            else
+            {
                 unsubscribeFromEvent($this->name, 'COMMAND');
             }
             
