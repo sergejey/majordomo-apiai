@@ -1,0 +1,51 @@
+<!-- table apiai_entities search -->
+<table width=100% border=0><tr>
+<td valign=top>
+<!-- results -->
+[#if RESULT#]
+<!-- paging -->
+<!-- / paging -->
+<!-- search results (list) -->
+<form action="?" method="post" name="frmList_apiai_entities" style="padding:0px" class="form">
+<table  align=center class="table table-striped">
+<tbody>
+[#begin RESULT#]
+<tr style="height:52px" class="hover_btn2">
+ <td style="vertical-align:middle"
+  >
+  <b>
+   [#NAME#]
+  </a></b>
+ </td>
+ <td>[#LAST_EXPORT#]</td>
+ <td style="vertical-align:middle" width="1%" nowrap>
+  <div style="width:120px">
+  [#if "<#ACTION#>"=="admin"#]
+   [#if "<#DEV_API_KEY#>"!=""#]
+    <a href="?view_mode=send_apiai_entity&id=[#ID#]" class="btn btn-default" title="Send"><i class="glyphicon glyphicon-send"></i></a>
+   [#endif DEV_API_KEY#]
+   <a href="?view_mode=edit_apiai_entities&id=[#ID#]" class="btn btn-default" title="Edit"><i class="glyphicon glyphicon-pencil"></i></a>
+   <a href="?view_mode=delete_apiai_entities&id=[#ID#]" onClick="return confirm('Are you sure? Please confirm.')" class="btn btn-default" title="Delete"><i class="glyphicon glyphicon-remove"></i></a>
+  [#endif ACTION#]
+  </div>
+ </td>
+</tr>
+[#end RESULT#]
+</tbody>
+</table>
+<input type="hidden" name="data_source" value="<#DATA_SOURCE#>">
+<input type="hidden" name="view_mode" value="multiple_apiai_entities">
+</form>
+<!-- / search results (list) -->
+<!-- paging -->
+<!-- / paging -->
+[#else RESULT#]
+<p>
+<font color="red"><#LANG_NO_RECORDS_FOUND#></font>
+</p>
+[#endif RESULT#]
+<!-- / results -->
+</td></tr></table>
+<p>
+<a href="?view_mode=edit_apiai_entities" class="btn btn-default"><i class="glyphicon glyphicon-plus"></i> <#LANG_ADD#></a>
+</p>

@@ -1,24 +1,3 @@
-
-[#if API_KEY!=""#]
-<form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal">
-  <div class="form-group">
-   <label class="col-lg-3 control-label"[#if ERR_TITLE#] style="color:red;font-weight:bold"[#endif#]>
-    Test Query:
-   </label>
-   <div class="col-lg-4"><input type="text" class="form-control" name="message" value="[#MESSAGE#]"></div>
-  </div>
-  <div class="form-group">
-   <div class="col-lg-offset-3 col-lg-4">
-    <button type="submit" name="subm" value="Submit" class="btn btn-primary">Test</button>
-    <input type="hidden" name="mode" value="test">
-   </div>
-  </div>
- </fieldset>
-</form>
-[#endif#]
-[#if RESPONSE!=""#]
-<pre>[#RESPONSE#]</pre>
-[#endif RESPONSE#]
 <!-- table apiai_actions search -->
 <table width=100% border=0><tr>
 <td valign=top>
@@ -68,3 +47,6 @@
 [#endif RESULT#]
 <!-- / results -->
 </td></tr></table>
+<p>
+<a href="?view_mode=edit_apiai_actions" class="btn btn-default"><i class="glyphicon glyphicon-plus"></i> <#LANG_ADD#></a>
+</p>

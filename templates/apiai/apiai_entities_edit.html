@@ -1,5 +1,5 @@
 
-<!-- Table 'apiai_actions' edit -->
+<!-- Table 'apiai_entities' edit -->
 <form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal">
 [#if OK#]
 <div class="alert alert-success"><#LANG_DATA_SAVED#></div>
@@ -17,7 +17,7 @@
   <#LANG_TITLE#>:
    (*)
  </label>
- <div class="col-lg-8"><input type="text" class="form-control" name="title" value="[#TITLE#]" id="title"></div>
+ <div class="col-lg-8"><input type="text" class="form-control" name="name" value="[#NAME#]" id="name"></div>
 </div>
 
  <div class="form-group ">
@@ -26,13 +26,6 @@
    [#if ERRORS!=""#]<br><font color='red'>[#ERRORS#]</font><br>[#endif ERRORS#]
    [#module name="blockly_code" system_name="apiai<#ID#>" code_field="code" action=""#]
    <div id="code_area">
-    <pre>Available variables:                             Avaliable functions:
-  &amp;$data                                           $setContext = function ($name, $lifespan = 5, $parameters = null)
-  $params                                          $deleteContext = function ($name = '')
-  $source                                          $globalContexts = function ()
-  $action_name                                     $setGlobalContext = function ($name, $lifespan = 5, $parameters = null)
-  $contexts                                        $deleteGlobalContext = function ($name)
-                                                   $setSessionEntity = function ($entity_name)</pre>
     <textarea name="code" id="code" rows=30 cols=100 class="form-control">[#CODE#]</textarea>
    </div>
 
@@ -46,8 +39,9 @@
  [#else ID#]
  <button type="submit" name="subm" value="Add" class="btn btn-primary"><#LANG_ADD#></button>
  [#endif ID#]
- <a href="?" class="btn btn-default "><#LANG_BACK#></a>
+ <a href="?view_mode=search_apiai_entities" class="btn btn-default "><#LANG_BACK#></a>
 <input type="hidden" name="id" value="<#ID#>">
+<input type="hidden" name="data_source" value="<#DATA_SOURCE#>">
 <input type="hidden" name="view_mode" value="<#VIEW_MODE#>">
 <input type="hidden" name="edit_mode" value="<#EDIT_MODE#>">
 <input type="hidden" name="mode" value="update">
