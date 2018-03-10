@@ -309,7 +309,7 @@ class apiai extends module
         
         $source = '';
         foreach ($sessions as $key => $value) {
-            if ($value == $sessionId) {
+            if ($value['id'] == $sessionId) {
                 $source = $key;
                 break;
             }
