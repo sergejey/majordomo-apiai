@@ -27,12 +27,13 @@
    [#module name="blockly_code" system_name="apiai<#ID#>" code_field="code" action=""#]
    <div id="code_area">
     <pre>Available variables:                             Available functions:
-  &amp;$data                                           $setContext = function ($name, $lifespan = 5, $parameters = null)
-  $params                                          $deleteContext = function ($name = '')
-  $source                                          $globalContexts = function ()
-  $action_name                                     $setGlobalContext = function ($name, $lifespan = 5, $parameters = null)
-  $contexts                                        $deleteGlobalContext = function ($name)
-                                                   $setSessionEntity = function ($entity_name)</pre>
+  &amp;$data                                           $setContext($name, $lifespan = 5, $parameters = null)
+  $params                                          $deleteContext($name = '')
+  $source                                          $globalContexts()
+  $action_name                                     $setGlobalContext($name, $lifespan = 5, $parameters = null)
+  $contexts                                        $deleteGlobalContext($name)
+                                                   $setSessionEntity($entity_name)
+                                                   $context($name)</pre>
     <textarea name="code" id="code" rows=30 cols=100 class="form-control">[#CODE#]</textarea>
    </div>
 

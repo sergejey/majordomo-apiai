@@ -610,6 +610,15 @@ class apiai extends module
         SQLUpdate('apiai_actions', $rec);
         
         $self = $this;
+
+        $context = function($name) use ($contexts)
+        {
+            foreach($contexts as $ctx) {
+                if ($name == $ctx['name']) {
+                    return $ctx;
+                }
+            }
+        };
         
         $setContext = function ($name, $lifespan = 5, $parameters = null) use ($self, $source)
         {
