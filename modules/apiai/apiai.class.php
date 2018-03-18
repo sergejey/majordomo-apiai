@@ -309,7 +309,7 @@ class apiai extends module
         
         $source = '';
         foreach ($sessions as $key => $value) {
-            if ($value == $sessionId) {
+            if ($value['id'] == $sessionId) {
                 $source = $key;
                 break;
             }
@@ -610,6 +610,15 @@ class apiai extends module
         SQLUpdate('apiai_actions', $rec);
         
         $self = $this;
+
+        $context = function($name) use ($contexts)
+        {
+            foreach($contexts as $ctx) {
+                if ($name == $ctx['name']) {
+                    return $ctx;
+                }
+            }
+        };
         
         $setContext = function ($name, $lifespan = 5, $parameters = null) use ($self, $source)
         {
