@@ -557,12 +557,11 @@ class apiai extends module
             }
         }
         
-        if ($data['result']['action'] != 'input.unknown' && $data['result']['action'] != '') {
+       if ($data['result']['metadata']) {
             return 1;
         } else {
             return 0;
         }
-        
     }
     
     function runAction($action_name, &$data)
