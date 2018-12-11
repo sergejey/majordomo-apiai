@@ -529,8 +529,12 @@ class apiai extends module
         
         $source = $this->getSource($data['sessionId']);
         
-        if ($data['result']['action']) {
-            $action_name = $data['result']['action'];
+        $action_name = $data['result']['action'];
+
+        if (!$this->config['SPEAK_UNKNOWN'] && ($action_name == 'input.unknown'))
+            return 0;
+
+        if ($action_name) {
             $actionResult = $this->runAction($action_name, $data);
         } else if ($data['result']['metadata']['intentName']) {
             $action_name = $data['result']['metadata']['intentName'];
@@ -542,22 +546,20 @@ class apiai extends module
         
         $message = $data['result']['fulfillment']['speech'];
         if ($message != '') {
-            if ($data['result']['action'] != 'input.unknown' || $this->config['SPEAK_UNKNOWN']) {
-                $incomplete = $data['result']['actionIncomplete'];
-                $majordroid = false;
-                if ($incomplete) {
-                    $rec        = SQLSelectOne("select MAJORDROID_API from terminals where NAME like '" . DBSafe($source) . "'");
-                    $majordroid = $rec['MAJORDROID_API'] == 1;
-                }
-                
-                if ($majordroid)
-                    ask($message, $source);
-                else if (!sayTo($message, $this->config['SPEAK_PRIORITY'], $source))
-                    sayReply($message, $this->config['SPEAK_PRIORITY']);
+            $incomplete = $data['result']['actionIncomplete'];
+            $majordroid = false;
+            if ($incomplete) {
+                $rec        = SQLSelectOne("select MAJORDROID_API from terminals where NAME like '" . DBSafe($source) . "'");
+                $majordroid = $rec['MAJORDROID_API'] == 1;
             }
+            
+            if ($majordroid)
+                ask($message, $source);
+            else if (!sayTo($message, $this->config['SPEAK_PRIORITY'], $source))
+                sayReply($message, $this->config['SPEAK_PRIORITY']);
         }
         
-       if ($data['result']['metadata']) {
+        if ($data['result']['metadata']) {
             return 1;
         } else {
             return 0;
