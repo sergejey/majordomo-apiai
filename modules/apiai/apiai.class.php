@@ -132,7 +132,6 @@ class apiai extends module
         
         $out['API_KEY']                 = $this->config['API_KEY'];
         $out['DEV_API_KEY']             = $this->config['DEV_API_KEY'];
-        $out['CONFIG_MODULE_PRIORITY']  = isset($this->config['CONFIG_MODULE_PRIORITY']) ? $this->config['CONFIG_MODULE_PRIORITY'] : 100;
         $out['CONFIG_SPEAK_PRIORITY']   = $this->config['SPEAK_PRIORITY'];
         $out['CONFIG_SPEAK_UNKNOWN']    = $this->config['SPEAK_UNKNOWN'];
         $out['CONFIG_LANGUAGE']         = $this->config['LANGUAGE'];
@@ -144,8 +143,6 @@ class apiai extends module
             $this->config['API_KEY'] = $api_key;
             global $dev_api_key;
             $this->config['DEV_API_KEY'] = $dev_api_key;
-            global $module_priority;
-            $this->config['CONFIG_MODULE_PRIORITY'] = (int) $module_priority;
             global $speak_priority;
             $this->config['SPEAK_PRIORITY'] = (int) $speak_priority;
             global $speak_unknown;
@@ -158,7 +155,7 @@ class apiai extends module
             $this->saveConfig();
             
             if ($this->config['API_KEY'] != '') {
-                subscribeToEvent($this->name, 'COMMAND', '', (int) $module_priority);
+                subscribeToEvent($this->name, 'COMMAND');
             }
             else
             {
